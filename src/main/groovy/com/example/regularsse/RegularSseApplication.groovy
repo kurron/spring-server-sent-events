@@ -29,12 +29,12 @@ class RegularSseApplication {
 	 * Simulate an order pipeline.
 	 */
 	final static stages = ['Accepted',
-						   'Inventory Confirmed',
-						   'Payment Confirmed',
-						   'Out to shipping',
-						   'In Transit',
-						   'Delivered',
-						   'Completed']
+						             'Inventory Confirmed',
+						             'Payment Confirmed',
+						             'Out to shipping',
+						             'In Transit',
+						             'Delivered',
+						             'Completed']
 
 	/**
 	 * The collection of clients that want order update notifications.
@@ -83,9 +83,9 @@ class RegularSseApplication {
 	 * @return fully assembled emitter.
 	 */
 	private static SseEmitter createEmitter( UUID subscriber,
-			                                 Integer orderID,
-											 Map<UUID, SseEmitter> emitters,
-											 Map<Integer,List<UUID>> watching ) {
+			                                     Integer orderID,
+											                     Map<UUID, SseEmitter> emitters,
+											                     Map<Integer,List<UUID>> watching ) {
 		def emitter = new SseEmitter( HOW_LONG_THE_CLIENT_WILL_WAIT_FOR_UPDATES )
 		updateSubscriberToEmitterMappings ( emitters, subscriber, emitter )
 		updateOrderToSubscriberMapping( watching, orderID, subscriber )
@@ -102,13 +102,13 @@ class RegularSseApplication {
 	 * @param emitter emitter to configure.
 	 */
 	private static void installLifecycleCallbacks( Map<Integer,List<UUID>> watching,
-												   Integer orderID,
-												   UUID subscriber,
-												   Map<UUID, SseEmitter> emitters,
-												   SseEmitter emitter ) {
+												                         Integer orderID,
+												                         UUID subscriber,
+												                         Map<UUID, SseEmitter> emitters,
+												                         SseEmitter emitter ) {
 		def callback = {
 			log.info( 'Cleaning up resources for subscriber {}.', subscriber )
-			watching.get( orderID ).remove(subscriber)
+			watching.get( orderID ).remove( subscriber )
 			emitters.remove( subscriber )
 		}
 		emitter.onCompletion( callback)
@@ -122,8 +122,8 @@ class RegularSseApplication {
 	 * @param emitter emitter to map.
 	 */
 	private static void updateSubscriberToEmitterMappings( Map<UUID, SseEmitter> emitters,
-														   UUID subscriber,
-														   SseEmitter emitter ) {
+														                             UUID subscriber,
+														                             SseEmitter emitter ) {
 		emitters.put( subscriber, emitter )
 	}
 
@@ -134,8 +134,8 @@ class RegularSseApplication {
 	 * @param subscriber ID of the subscriber we are creating the emitter for.
 	 */
 	private static void updateOrderToSubscriberMapping( Map<Integer, List<UUID>> watching,
-													    int orderID,
-													    UUID subscriber ) {
+													                            int orderID,
+													                            UUID subscriber ) {
 		watching.putIfAbsent( orderID.toInteger(), [] )
 		watching.get( orderID.toInteger() ).add( subscriber )
 	}
