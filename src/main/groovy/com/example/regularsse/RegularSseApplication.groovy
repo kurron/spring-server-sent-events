@@ -1,6 +1,11 @@
 package com.example.regularsse
 
 import groovy.util.logging.Slf4j
+import java.util.concurrent.BlockingQueue
+import java.util.concurrent.ConcurrentHashMap
+import java.util.concurrent.LinkedBlockingQueue
+import java.util.concurrent.ThreadLocalRandom
+import java.util.concurrent.atomic.AtomicInteger
 import org.springframework.boot.SpringApplication
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.http.MediaType
@@ -10,12 +15,6 @@ import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.RestController
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter
-
-import java.util.concurrent.BlockingQueue
-import java.util.concurrent.ConcurrentHashMap
-import java.util.concurrent.LinkedBlockingQueue
-import java.util.concurrent.ThreadLocalRandom
-import java.util.concurrent.atomic.AtomicInteger
 
 @SpringBootApplication
 @RestController
@@ -180,9 +179,10 @@ class RegularSseApplication {
      * @param stage the order's current state.
      */
     private static void sendUpdate( SseEmitter emitter, int orderID, String stage ) {
-        def builder = SseEmitter.event().name( "Update on order ${orderID}" )
-                .id( UUID.randomUUID() as String )
-                .data( stage, MediaType.TEXT_PLAIN )
+        def builder = SseEmitter.event()
+                                .name( "Update on order ${orderID}" )
+                                .id( UUID.randomUUID() as String )
+                                .data( stage, MediaType.TEXT_PLAIN )
         emitter.send( builder )
         if ( 'Completed' == stage ) {
             log.info( 'Updates on order {} are complete', orderID )
