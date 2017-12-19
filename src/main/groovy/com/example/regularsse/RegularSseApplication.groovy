@@ -181,7 +181,7 @@ class RegularSseApplication {
     private static void sendUpdate( SseEmitter emitter, int orderID, String stage ) {
         def builder = SseEmitter.event()
                                 .name( "Update on order ${orderID}" )
-                                .id( UUID.randomUUID() as String )
+                                .id( UUID.randomUUID() as String ).reconnectTime ( 0).comment()
                                 .data( stage, MediaType.TEXT_PLAIN )
         emitter.send( builder )
         if ( 'Completed' == stage ) {
